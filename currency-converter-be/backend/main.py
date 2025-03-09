@@ -1,23 +1,35 @@
-# This is a sample Python script.
-from flask import Flask
+from flask import Flask, request, jsonify
+from flask_cors import CORS
+from data import conversion_rates_json
+
 app = Flask(__name__)
-
-# Press Mayús+F10 to execute it or replace it with your code.
-# Press Double Shift to search everywhere for classes, files, tool windows, actions, and settings.
+CORS(app)
 
 
-@app.route('/')
-def hello_world():
-    return '<p>Hello, World!</p>'
+@app.route("/", methods=["GET"])
+def get_rates():
+    return conversion_rates_json
 
 
-def print_hi(name):
-    # Use a breakpoint in the code line below to debug your script.
-    print(f'Hi, {name}')  # Press Ctrl+F8 to toggle the breakpoint.
+@app.route("/convert", methods=["POST"])
+def convert():
+    try:
+        data = request.json
+        origin = data.get("origin")
+        destiny = data.get("destiny")
+        amount = data.get("amount")
+
+        origin_rate = float(origin_rate)
+        destiny_rate = float(destiny_rate)
+
+        rate = destiny_rate / origin_rate
+        result = amount * rate
+
+        return jsonify({"result": result})
+
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
 
 
-# Press the green button in the gutter to run the script.
-if __name__ == '__main__':
-    print_hi('PyCharm')
-
-# See PyCharm help at https://www.jetbrains.com/help/pycharm/
+if __name__ == "__main__":
+    app.run(debug=True)
