@@ -19,10 +19,11 @@ export const Home: React.FC = () => {
     setError(null);
     try {
       const res = await CurrencyService.getCurrencies();
-      setCurrencies(res.data);
+      console.log("API Response:", res);
+      setCurrencies(res);
     } catch (err) {
-      console.error(err);
-      setError("Failed to fetch currencies.");
+      console.error("Error fetching currencies:", err);
+      setError("Failed to load currencies.");
     } finally {
       setLoading(false);
     }
@@ -30,29 +31,31 @@ export const Home: React.FC = () => {
 
   const handleConvert = async () => {
     if (!originCurrency || !destinyCurrency || amount <= 0) {
-      alert("Please fill all fields and enter a valid amount.");
+      setError("Please fill all fields and enter a valid amount.");
       return;
     }
+
+    setError(null);
+    setLoading(true);
+
     try {
       const res = await CurrencyService.convertCurrency(
         originCurrency,
         destinyCurrency,
         amount
       );
-      setResult(res.data.result);
-    } catch (error) {
-      console.error(error);
-      alert("Error converting currencies.");
+      if (res.data?.result) {
+        setResult(res.data.result);
+      } else {
+        throw new Error("Invalid response from server");
+      }
+    } catch (err) {
+      console.error("Error converting currency:", err);
+      setError("Error converting currencies.");
+    } finally {
+      setLoading(false);
     }
   };
-
-  if (loading) {
-    return <div>Loading...</div>;
-  }
-
-  if (error) {
-    return <div>Error: {error}</div>;
-  }
 
   return (
     <div className="flex items-center justify-center h-screen">
@@ -60,6 +63,10 @@ export const Home: React.FC = () => {
         <div className="font-bold text-xl mb-4 text-center">
           Currency Converter
         </div>
+
+        {loading && <p className="text-center text-blue-500">Loading...</p>}
+        {error && <p className="text-center text-red-500">{error}</p>}
+
         <div className="flex flex-col space-y-4">
           <select
             id="origin"
@@ -95,7 +102,7 @@ export const Home: React.FC = () => {
             placeholder="Amount"
             className="py-2 px-4 rounded"
             value={amount}
-            onChange={(e) => setAmount(parseFloat(e.target.value) || 0)} // Asegurar que el valor sea numérico
+            onChange={(e) => setAmount(parseFloat(e.target.value) || 0)}
           />
 
           <button
