@@ -25,3 +25,22 @@ dist-ssr
 .idea
 _pycache_
 .git
+
+
+# Entorno virtual
+venv/
+
+# Archivos de caché de Python
+*.pyc
+*.pyo
+*.pyd
+
+
+# Archivos de bases de datos locales
+*.sqlite3
+*.db
+
+# Archivos generados por herramientas
+*.egg-info/
+dist/
+build/
